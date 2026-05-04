@@ -1,0 +1,16 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '4200:80'
+    environment:
+      # API URL is baked into the Angular build via environment.ts.
+      # To change at runtime without rebuild, migrate to a runtime config.json approach.
+      API_URL: 'https://localhost:7016/api'
+    restart: unless-stopped
+
+# NOTE: The API runs on the host at https://localhost:7016.
+# From inside the Docker container, use host.docker.internal instead of localhost.
+# Ensure CORS is configured in the .NET API to allow http://localhost:4200 and http://localhost.

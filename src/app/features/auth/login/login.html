@@ -1,0 +1,98 @@
+<div class="flex min-h-screen items-center justify-center bg-background p-4">
+  <div class="w-full max-w-md">
+  
+    <div class="rounded-xl border border-border bg-card p-8 shadow-sm">
+  
+      <div class="mb-6 text-center">
+        <h1 class="text-2xl font-bold text-foreground">Entrar</h1>
+        <p class="mt-1 text-sm text-muted-foreground">Acesse sua conta para continuar</p>
+      </div>
+
+      @if (errorMessage()) {
+        <div
+          class="mb-4 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-5">
+
+        <div class="space-y-1.5">
+          <label hlmLabel for="email">Email</label>
+          <input
+            hlmInput
+            id="email"
+            type="email"
+            placeholder="seu@email.com"
+            formControlName="email"
+            autocomplete="email"
+          />
+          @if (email.invalid && email.touched) {
+            <p class="text-xs text-destructive">
+              @if (email.errors?.['required']) {
+                Email é obrigatório.
+              } @else if (email.errors?.['email']) {
+                Informe um email válido.
+              }
+            </p>
+          }
+        </div>
+
+        <div class="space-y-1.5">
+          <label hlmLabel for="senha">Senha</label>
+          <input
+            hlmInput
+            id="senha"
+            type="password"
+            placeholder="••••••"
+            formControlName="senha"
+            autocomplete="current-password"
+          />
+          @if (senha.invalid && senha.touched) {
+            <p class="text-xs text-destructive">
+              @if (senha.errors?.['required']) {
+                Senha é obrigatória.
+              } @else if (senha.errors?.['minlength']) {
+                Mínimo de 6 caracteres.
+              }
+            </p>
+          }
+        </div>
+
+        <button hlmBtn type="submit" class="w-full" [disabled]="loading() || form.invalid">
+          @if (loading()) {
+            <svg
+              class="mr-2 h-4 w-4 animate-spin"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              ></path>
+            </svg>
+            Entrando...
+          } @else {
+            Entrar
+          }
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-muted-foreground">
+        Não tem uma conta?
+        <a routerLink="/register" class="font-medium text-primary hover:underline">Cadastre-se</a>
+      </p>
+    </div>
+  </div>
+</div>

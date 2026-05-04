@@ -1,0 +1,119 @@
+<div class="min-h-[calc(100vh-4rem)] bg-background px-4 py-8">
+  <div class="mx-auto max-w-5xl space-y-6">
+    <div>
+      <h1 class="text-2xl font-bold text-foreground">Cadastrar estabelecimento</h1>
+      <p class="mt-1 text-sm text-muted-foreground">
+        Preencha os dados e clique no mapa para definir a localização.
+      </p>
+    </div>
+
+    @if (errorMessage()) {
+      <div
+        class="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+      >
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="grid gap-6 lg:grid-cols-2">
+
+      <div class="space-y-5 rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div class="space-y-1.5">
+          <label hlmLabel for="nome">Nome</label>
+          <input hlmInput id="nome" type="text" formControlName="nome" />
+          @if (form.controls.nome.invalid && form.controls.nome.touched) {
+            <p class="text-xs text-destructive">Nome é obrigatório.</p>
+          }
+        </div>
+
+        <div class="space-y-1.5">
+          <label hlmLabel for="categoria">Categoria</label>
+          <select
+            id="categoria"
+            formControlName="categoria"
+            class="h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="">Selecione...</option>
+            @for (c of categorias; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+          @if (form.controls.categoria.invalid && form.controls.categoria.touched) {
+            <p class="text-xs text-destructive">Categoria é obrigatória.</p>
+          }
+        </div>
+
+        <div class="space-y-1.5">
+          <label hlmLabel for="descricao">Descrição</label>
+          <textarea
+            id="descricao"
+            formControlName="descricao"
+            rows="4"
+            class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          ></textarea>
+          @if (form.controls.descricao.invalid && form.controls.descricao.touched) {
+            <p class="text-xs text-destructive">Descrição é obrigatória.</p>
+          }
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <label hlmLabel for="latitude">Latitude</label>
+            <input
+              hlmInput
+              id="latitude"
+              type="number"
+              step="0.000001"
+              formControlName="latitude"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label hlmLabel for="longitude">Longitude</label>
+            <input
+              hlmInput
+              id="longitude"
+              type="number"
+              step="0.000001"
+              formControlName="longitude"
+            />
+          </div>
+        </div>
+        @if (
+          (form.controls.latitude.invalid && form.controls.latitude.touched) ||
+          (form.controls.longitude.invalid && form.controls.longitude.touched)
+        ) {
+          <p class="text-xs text-destructive">
+            Selecione um ponto no mapa ou use a sua localização.
+          </p>
+        }
+
+        <button hlmBtn variant="outline" type="button" (click)="useMyLocation()" class="w-full">
+          Usar minha localização
+        </button>
+
+        <div class="flex gap-2 pt-2">
+          <a hlmBtn variant="ghost" routerLink="/meus-cadastros" class="flex-1">Cancelar</a>
+          <button hlmBtn type="submit" [disabled]="loading()" class="flex-1">
+            {{ loading() ? 'Salvando...' : 'Cadastrar' }}
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="relative h-[500px] overflow-hidden rounded-xl border border-border bg-card shadow-sm"
+      >
+        <div
+          leaflet
+          [leafletOptions]="mapOptions"
+          (leafletMapReady)="onMapReady($event)"
+          class="h-full w-full"
+        ></div>
+        <div
+          class="pointer-events-none absolute left-3 top-3 rounded-md bg-card/90 px-3 py-1.5 text-xs text-card-foreground shadow"
+        >
+          Clique no mapa para definir a localização
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

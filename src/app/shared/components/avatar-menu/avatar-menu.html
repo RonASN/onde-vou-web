@@ -1,0 +1,56 @@
+<div class="relative">
+  <button
+    type="button"
+    (click)="toggle()"
+    class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+    [attr.aria-haspopup]="'menu'"
+    [attr.aria-expanded]="open()"
+    aria-label="Menu do usuário"
+  >
+    {{ initial() }}
+  </button>
+
+  @if (open()) {
+    <div
+      role="menu"
+      class="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-lg"
+    >
+
+      <div class="px-3 py-2">
+        <p class="truncate text-sm font-medium text-foreground">
+          {{ auth.currentUser()?.nome }}
+        </p>
+        <p class="truncate text-xs text-muted-foreground">
+          {{ auth.currentUser()?.email }}
+        </p>
+      </div>
+
+      <div class="my-1 h-px bg-border"></div>
+
+  
+      <button
+        type="button"
+        role="menuitem"
+        (click)="onLogout()"
+        class="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:outline-none"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" x2="9" y1="12" y2="12" />
+        </svg>
+        Sair
+      </button>
+    </div>
+  }
+</div>
