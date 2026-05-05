@@ -52,12 +52,6 @@ export class AuthService {
   }
 
   register(dto: RegisterRequest): Observable<User> {
-    // POST /Usuario cria o usuário (sem retornar token); em seguida fazemos
-    // auto-login. Se o backend devolver 409 (e-mail já existe), tentamos
-    // logar com as credenciais recém-enviadas: caso a senha seja válida,
-    // significa que o usuário foi efetivamente criado (ex.: submit duplicado
-    // — a 1ª request criou o registro e a 2ª colidiu) e o fluxo segue
-    // normalmente. Caso contrário, repropagamos o 409 original.
     const credentials = { email: dto.email, senha: dto.senha };
     return this.http.post<User>(`${environment.apiUrl}/Usuario`, dto).pipe(
       switchMap(() => this.login(credentials)),
