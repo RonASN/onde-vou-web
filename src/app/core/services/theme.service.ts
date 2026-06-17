@@ -19,7 +19,6 @@ export class ThemeService {
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {
-      /* ignore */
     }
   }
 
@@ -28,7 +27,6 @@ export class ThemeService {
       const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
       if (stored === 'light' || stored === 'dark') return stored;
     } catch {
-      /* ignore */
     }
     if (
       typeof window !== 'undefined' &&

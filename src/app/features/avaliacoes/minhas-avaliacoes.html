@@ -1,27 +1,97 @@
-<section
-  class="container mx-auto flex flex-col items-center justify-center gap-4 px-4 py-16 text-center"
->
-  <div
-    class="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <polygon
-        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-      />
-    </svg>
+<div class="px-4 py-8">
+  <div class="mx-auto max-w-3xl space-y-6">
+
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-foreground">Minhas avaliações</h1>
+      <p class="mt-1 text-muted-foreground">Todas as avaliações que você deixou.</p>
+    </div>
+
+    @if (loading()) {
+      <div class="space-y-4">
+        @for (_ of [1, 2, 3]; track $index) {
+          <div class="animate-pulse rounded-xl border border-border bg-card p-5">
+            <div class="mb-3 h-5 w-1/2 rounded bg-muted"></div>
+            <div class="mb-2 h-4 w-1/4 rounded-full bg-muted"></div>
+            <div class="h-4 w-full rounded bg-muted"></div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (error(); as msg) {
+      <div
+        class="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+      >
+        {{ msg }}
+      </div>
+    }
+
+    @if (hasNone()) {
+      <div
+        class="rounded-xl border border-dashed border-border bg-card p-10 text-center text-muted-foreground"
+      >
+        <div class="mb-3 flex justify-center">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            class="text-muted-foreground/50"
+          >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        </div>
+        <p class="mb-2 font-medium">Você ainda não avaliou nenhum estabelecimento.</p>
+        <p class="text-sm">Explore locais e deixe sua opinião na página de detalhes.</p>
+        <a routerLink="/" class="mt-4 inline-block text-sm font-medium text-primary hover:underline">
+          Explorar estabelecimentos
+        </a>
+      </div>
+    }
+
+    @if (!loading() && avaliacoes().length > 0) {
+      <div class="space-y-4">
+        @for (av of avaliacoes(); track av.id) {
+          <div class="rounded-xl border border-border bg-card p-5 shadow-sm">
+            <div class="mb-2 flex items-start justify-between gap-3">
+              <a
+                [routerLink]="['/estabelecimento', av.estabelecimentoId]"
+                class="font-semibold text-card-foreground hover:text-primary hover:underline"
+              >
+                Ver estabelecimento
+              </a>
+              <span class="shrink-0 text-xs text-muted-foreground">
+                {{ av.dataCriacao | date: 'dd/MM/yyyy' }}
+              </span>
+            </div>
+            <div class="mb-2 flex items-center gap-2">
+              <div class="flex">
+                @for (star of stars; track star) {
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    [attr.fill]="av.nota >= star ? '#f59e0b' : 'none'"
+                    stroke="#f59e0b"
+                    stroke-width="2"
+                  >
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                    />
+                  </svg>
+                }
+              </div>
+              <span class="text-sm font-medium text-foreground">{{ av.nota }}/5</span>
+            </div>
+            @if (av.comentario) {
+              <p class="text-sm text-muted-foreground">{{ av.comentario }}</p>
+            }
+          </div>
+        }
+      </div>
+    }
+
   </div>
-  <h1 class="text-2xl font-semibold text-foreground">Minhas avaliações</h1>
-  <p class="max-w-md text-sm text-muted-foreground">
-    Você ainda não avaliou nenhum estabelecimento. Encontre lugares no mapa e deixe sua avaliação.
-  </p>
-</section>
+</div>

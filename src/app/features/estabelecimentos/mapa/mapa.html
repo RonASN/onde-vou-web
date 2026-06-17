@@ -1,0 +1,47 @@
+<div class="px-4 py-6">
+  <div class="mx-auto max-w-6xl space-y-4">
+
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-foreground">Mapa de Estabelecimentos</h1>
+      <p class="mt-1 text-sm text-muted-foreground">
+        Clique em um marcador para ver detalhes do estabelecimento.
+      </p>
+    </div>
+
+    @if (error(); as msg) {
+      <div
+        class="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+      >
+        {{ msg }}
+      </div>
+    }
+
+    <div class="relative overflow-hidden rounded-xl border border-border shadow-sm">
+      @if (loading()) {
+        <div
+          class="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+        >
+          <div class="flex flex-col items-center gap-3">
+            <svg
+              class="h-8 w-8 animate-spin text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            <p class="text-sm text-muted-foreground">Carregando estabelecimentos...</p>
+          </div>
+        </div>
+      }
+      <div
+        leaflet
+        [leafletOptions]="mapOptions"
+        (leafletMapReady)="onMapReady($event)"
+        class="h-[600px] w-full lg:h-[calc(100vh-16rem)]"
+      ></div>
+    </div>
+
+  </div>
+</div>

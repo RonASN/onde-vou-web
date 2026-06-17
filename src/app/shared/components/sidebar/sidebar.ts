@@ -6,7 +6,7 @@ import { TipoUsuario } from '../../../core/models/user.model';
 interface NavItem {
   readonly label: string;
   readonly path: string;
-  readonly icon: 'map' | 'star' | 'briefcase';
+  readonly icon: 'home' | 'map' | 'heart' | 'star' | 'briefcase';
   readonly visible: () => boolean;
 }
 
@@ -23,6 +23,24 @@ export class SidebarComponent {
   readonly isEmpresa = computed(() => this.auth.currentUser()?.tipoUsuario === TipoUsuario.Empresa);
 
   readonly items: NavItem[] = [
+    {
+      label: 'Feed',
+      path: '/',
+      icon: 'home',
+      visible: () => this.auth.isAuthenticated(),
+    },
+    {
+      label: 'Mapa',
+      path: '/estabelecimentos/mapa',
+      icon: 'map',
+      visible: () => this.auth.isAuthenticated(),
+    },
+    {
+      label: 'Favoritos',
+      path: '/favoritos',
+      icon: 'heart',
+      visible: () => this.auth.isAuthenticated(),
+    },
     {
       label: 'Minhas avaliações',
       path: '/minhas-avaliacoes',

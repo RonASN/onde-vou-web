@@ -1,0 +1,278 @@
+<div class="px-4 py-8">
+  <div class="mx-auto max-w-3xl space-y-8">
+
+    <!-- Back -->
+    <a
+      routerLink="/"
+      class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+      Voltar ao Feed
+    </a>
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="space-y-4">
+        <div class="animate-pulse space-y-4 rounded-xl border border-border bg-card p-6">
+          <div class="h-8 w-2/3 rounded bg-muted"></div>
+          <div class="h-5 w-1/4 rounded-full bg-muted"></div>
+          <div class="h-4 w-full rounded bg-muted"></div>
+          <div class="h-4 w-4/5 rounded bg-muted"></div>
+        </div>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (error(); as msg) {
+      <div
+        class="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+      >
+        {{ msg }}
+      </div>
+    }
+
+    <!-- Detalhes -->
+    @if (!loading() && estabelecimento(); as est) {
+
+      <!-- Header Card -->
+      <div class="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="space-y-2">
+            <div class="flex flex-wrap items-center gap-3">
+              <h1 class="text-2xl font-bold text-card-foreground">{{ est.nome }}</h1>
+              <span
+                class="rounded-full bg-primary/10 px-3 py-0.5 text-sm font-medium text-primary"
+              >
+                {{ est.categoria }}
+              </span>
+            </div>
+            @if (est.descricao) {
+              <p class="text-muted-foreground">{{ est.descricao }}</p>
+            }
+          </div>
+
+          <!-- Actions -->
+          <div class="flex shrink-0 gap-2">
+            <button
+              hlmBtn
+              [variant]="isFavorito() ? 'default' : 'outline'"
+              [disabled]="loadingFav()"
+              (click)="toggleFavorito()"
+              class="gap-2"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                [attr.fill]="isFavorito() ? 'currentColor' : 'none'"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+                />
+              </svg>
+              {{ isFavorito() ? 'Favoritado' : 'Favoritar' }}
+            </button>
+
+            @if (googleMapsUrl(); as url) {
+              <a
+                [href]="url"
+                target="_blank"
+                rel="noopener noreferrer"
+                hlmBtn
+                variant="outline"
+                class="gap-2"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M12 2C7.58 2 4 5.58 4 10c0 5.25 7 11.5 7.3 11.76a1 1 0 0 0 1.4 0C13 21.5 20 15.25 20 10c0-4.42-3.58-8-8-8zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"
+                  />
+                </svg>
+                Google Maps
+              </a>
+            }
+          </div>
+        </div>
+
+        <!-- Stats -->
+        @if (resumo(); as r) {
+          <div class="mt-4 flex flex-wrap items-center gap-6 border-t border-border pt-4">
+            <div class="flex items-center gap-2">
+              <div class="flex">
+                @for (star of stars; track star) {
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    [attr.fill]="r.mediaNotas >= star ? '#f59e0b' : 'none'"
+                    stroke="#f59e0b"
+                    stroke-width="2"
+                  >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                }
+              </div>
+              <span class="font-semibold text-foreground">{{ r.mediaNotas.toFixed(1) }}</span>
+              <span class="text-sm text-muted-foreground">
+                ({{ r.quantidadeAvaliacoes }} avaliação{{ r.quantidadeAvaliacoes !== 1 ? 'ões' : '' }})
+              </span>
+            </div>
+            <div class="text-sm text-muted-foreground">
+              {{ est.latitude.toFixed(6) }}, {{ est.longitude.toFixed(6) }}
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Avaliação Form -->
+      <div class="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h2 class="mb-4 text-lg font-semibold text-card-foreground">Deixar avaliação</h2>
+
+        @if (avaliacaoSucesso()) {
+          <div
+            class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-400"
+          >
+            Avaliação enviada com sucesso!
+          </div>
+        }
+
+        @if (avaliacaoError(); as msg) {
+          <div
+            class="mb-4 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            {{ msg }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmitAvaliacao()" novalidate class="space-y-4">
+          <!-- Star Rating -->
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium text-foreground">Nota</label>
+            <div class="flex gap-1">
+              @for (star of stars; track star) {
+                <button
+                  type="button"
+                  (click)="notaSelecionada.set(star)"
+                  class="transition-transform hover:scale-110 focus:outline-none"
+                  [title]="star + ' estrela(s)'"
+                >
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    [attr.fill]="notaSelecionada() >= star ? '#f59e0b' : 'none'"
+                    stroke="#f59e0b"
+                    stroke-width="2"
+                  >
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                    />
+                  </svg>
+                </button>
+              }
+              <span class="ml-2 self-center text-sm text-muted-foreground">
+                {{ notaSelecionada() }} estrela{{ notaSelecionada() !== 1 ? 's' : '' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Comentário -->
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium text-foreground" for="comentario">Comentário</label>
+            <textarea
+              id="comentario"
+              formControlName="comentario"
+              rows="3"
+              placeholder="Conte sua experiência..."
+              class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            ></textarea>
+            @if (form.controls.comentario.invalid && form.controls.comentario.touched) {
+              <p class="text-xs text-destructive">Comentário é obrigatório.</p>
+            }
+          </div>
+
+          <button hlmBtn type="submit" [disabled]="loadingAvaliacao()">
+            @if (loadingAvaliacao()) {
+              <svg
+                class="mr-2 h-4 w-4 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+            }
+            Enviar avaliação
+          </button>
+        </form>
+      </div>
+
+      <!-- Lista de Avaliações -->
+      <div class="space-y-4">
+        <h2 class="text-lg font-semibold text-foreground">
+          Avaliações
+          @if (resumo(); as r) {
+            <span class="ml-2 text-sm font-normal text-muted-foreground">
+              ({{ r.quantidadeAvaliacoes }})
+            </span>
+          }
+        </h2>
+
+        @if (avaliacoesOrdenadas().length === 0) {
+          <div
+            class="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground"
+          >
+            Nenhuma avaliação ainda. Seja o primeiro a avaliar!
+          </div>
+        }
+
+        @for (av of avaliacoesOrdenadas(); track av.id) {
+          <div class="rounded-xl border border-border bg-card p-5 shadow-sm">
+            <div class="mb-2 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <div
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+                >
+                  {{ av.usuarioNome.charAt(0).toUpperCase() }}
+                </div>
+                <span class="font-medium text-card-foreground">{{ av.usuarioNome }}</span>
+              </div>
+              <span class="text-xs text-muted-foreground">
+                {{ av.dataCriacao | date: 'dd/MM/yyyy' }}
+              </span>
+            </div>
+            <div class="mb-2 flex">
+              @for (star of stars; track star) {
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  [attr.fill]="av.nota >= star ? '#f59e0b' : 'none'"
+                  stroke="#f59e0b"
+                  stroke-width="2"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                </svg>
+              }
+            </div>
+            <p class="text-sm text-muted-foreground">{{ av.comentario }}</p>
+          </div>
+        }
+      </div>
+
+    }
+  </div>
+</div>
