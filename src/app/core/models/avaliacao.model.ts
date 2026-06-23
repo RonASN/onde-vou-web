@@ -8,6 +8,16 @@ export interface Avaliacao {
   estabelecimentoId: number;
 }
 
+export interface MinhaAvaliacao {
+  id: number;
+  estabelecimentoId: number;
+  estabelecimentoNome: string;
+  categoria: string;
+  nota: number;
+  comentario: string;
+  dataCriacao: string;
+}
+
 export interface CriarAvaliacaoRequest {
   nota: number;
   comentario: string;

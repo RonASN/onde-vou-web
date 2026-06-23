@@ -78,3 +78,8 @@ export interface GeoFeatureCollection {
   type: 'FeatureCollection';
   features: GeoFeature[];
 }
+
+export interface GeoFiltro {
+  nome?: string;
+  categoria?: string;
+}

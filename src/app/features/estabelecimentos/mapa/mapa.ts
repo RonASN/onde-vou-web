@@ -1,24 +1,34 @@
-import { Component, inject, NgZone, OnInit, signal } from '@angular/core';
+import { Component, inject, NgZone, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { divIcon, latLng, Map as LeafletMap, marker, tileLayer } from 'leaflet';
 import { GeoFeature } from '../../../core/models/establishment.model';
 import { EstablishmentService } from '../../../core/services/establishment.service';
+import { HlmInputDirective } from '../../../shared/ui/input.directive';
+
+const CATEGORIAS = ['Todas', 'Restaurante', 'Bar', 'Cafeteria', 'Pizzaria', 'Padaria'];
 
 @Component({
   selector: 'app-mapa',
   standalone: true,
-  imports: [LeafletModule],
+  imports: [LeafletModule, ReactiveFormsModule, HlmInputDirective],
   templateUrl: './mapa.html',
   styleUrl: './mapa.scss',
 })
-export class MapaComponent implements OnInit {
+export class MapaComponent implements OnInit, OnDestroy {
   private readonly service = inject(EstablishmentService);
   private readonly router = inject(Router);
   private readonly zone = inject(NgZone);
+  private readonly destroy$ = new Subject<void>();
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly categorias = CATEGORIAS;
+  readonly categoriaAtiva = signal('Todas');
+  readonly searchControl = new FormControl('', { nonNullable: true });
 
   readonly mapOptions = {
     layers: [
@@ -47,13 +57,37 @@ export class MapaComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.service.getGeo().subscribe({
+    this.loadGeo();
+    this.searchControl.valueChanges
+      .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => this.loadGeo());
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  onCategoryChange(cat: string): void {
+    this.categoriaAtiva.set(cat);
+    this.loadGeo();
+  }
+
+  private loadGeo(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    const nome = this.searchControl.value.trim() || undefined;
+    const cat = this.categoriaAtiva();
+    const categoria = cat === 'Todas' ? undefined : cat;
+
+    this.service.getGeo({ nome, categoria }).subscribe({
       next: (collection) => {
         this.geoFeatures = collection.features;
         this.geoLoaded = true;
         this.loading.set(false);
         if (this.map) {
-          this.createMarkersOnMap();
+          this.clearAndRenderMarkers();
         }
       },
       error: () => {
@@ -66,8 +100,18 @@ export class MapaComponent implements OnInit {
   onMapReady(map: LeafletMap): void {
     this.map = map;
     if (this.geoLoaded) {
-      this.createMarkersOnMap();
+      this.clearAndRenderMarkers();
     }
+  }
+
+  private clearAndRenderMarkers(): void {
+    if (!this.map) return;
+    this.map.eachLayer((layer) => {
+      if ((layer as { _latlng?: unknown })._latlng !== undefined) {
+        this.map!.removeLayer(layer);
+      }
+    });
+    this.createMarkersOnMap();
   }
 
   private createMarkersOnMap(): void {

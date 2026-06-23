@@ -9,7 +9,7 @@ import { HlmButtonDirective } from '../../shared/ui/button.directive';
 import { HlmInputDirective } from '../../shared/ui/input.directive';
 
 const PAGE_SIZE = 9;
-const CATEGORIAS = ['Todas', 'Restaurante', 'Bar', 'Academia', 'Mercado', 'Farmácia', 'Hotel'];
+const CATEGORIAS = ['Todas','Restaurante', 'Bar', 'Cafeteria', 'Pizzaria', 'Padaria'];
 
 @Component({
   selector: 'app-feed',
@@ -23,6 +23,7 @@ export class FeedComponent implements OnInit, OnDestroy {
 
   readonly categorias = CATEGORIAS;
   readonly searchControl = new FormControl('', { nonNullable: true });
+  readonly raioControl = new FormControl(5, { nonNullable: true });
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
@@ -104,7 +105,8 @@ export class FeedComponent implements OnInit, OnDestroy {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        this.service.proximos(latitude, longitude, 5).subscribe({
+        const raio = Math.min(150, Math.max(1, this.raioControl.value));
+        this.service.proximos(latitude, longitude, raio).subscribe({
           next: (list) => {
             this.proximos.set(list);
             this.modoProximos.set(true);

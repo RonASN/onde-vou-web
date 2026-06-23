@@ -31,7 +31,7 @@ export class SidebarComponent {
     },
     {
       label: 'Mapa',
-      path: '/estabelecimentos/mapa',
+      path: '/mapa',
       icon: 'map',
       visible: () => this.auth.isAuthenticated(),
     },

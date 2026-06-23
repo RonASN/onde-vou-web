@@ -34,9 +34,7 @@ export class AuthService {
       return;
     }
     if (token) {
-      this.fetchCurrentUser().subscribe({
-        error: () => this.logout(),
-      });
+      this.fetchCurrentUser().subscribe();
     }
   }
 

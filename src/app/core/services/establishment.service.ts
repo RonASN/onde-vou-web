@@ -11,6 +11,7 @@ import {
   FeedFiltro,
   FeedPaginado,
   GeoFeatureCollection,
+  GeoFiltro,
 } from '../models/establishment.model';
 
 @Injectable({ providedIn: 'root' })
@@ -18,8 +19,11 @@ export class EstablishmentService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/Estabelecimento`;
 
-  getGeo(): Observable<GeoFeatureCollection> {
-    return this.http.get<GeoFeatureCollection>(`${this.base}/geojson`);
+  getGeo(filtro: GeoFiltro = {}): Observable<GeoFeatureCollection> {
+    let params = new HttpParams();
+    if (filtro.nome) params = params.set('nome', filtro.nome);
+    if (filtro.categoria) params = params.set('categoria', filtro.categoria);
+    return this.http.get<GeoFeatureCollection>(`${this.base}/geo`, { params });
   }
 
   feed(filtro: FeedFiltro = {}): Observable<FeedPaginado> {

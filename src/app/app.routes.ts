@@ -49,6 +49,29 @@ export const routes: Routes = [
             (m) => m.CadastrarEstabelecimentoComponent,
           ),
       },
+      {
+        path: 'estabelecimento/:id',
+        data: { breadcrumb: 'Detalhes' },
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/estabelecimentos/detalhes/detalhes').then(
+            (m) => m.DetalhesComponent,
+          ),
+      },
+      {
+        path: 'favoritos',
+        data: { breadcrumb: 'Meus favoritos' },
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/favoritos/favoritos').then((m) => m.FavoritosComponent),
+      },
+      {
+        path: 'mapa',
+        data: { breadcrumb: 'Mapa' },
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/estabelecimentos/mapa/mapa').then((m) => m.MapaComponent),
+      },
     ],
   },
   {
